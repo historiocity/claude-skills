@@ -1,6 +1,6 @@
 {
   "name": "global-skills",
-  "description": "Reusable global skills usable in any project. Currently: grill-me (scoping interviews).",
+  "description": "Reusable global skills usable in any project. Currently: grill-me (scoping interviews), linkedin-post (LinkedIn post development).",
   "version": "0.1.0",
   "author": {
     "name": "Justin Dombrowski"
