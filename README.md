@@ -12,7 +12,8 @@ claude-skills/
 └── plugins/global-skills/              ← one plugin bundling all global skills
     ├── .claude-plugin/plugin.json
     └── skills/
-        └── grill-me/                   scoping-interview skill
+        ├── grill-me/                   scoping-interview skill
+        └── linkedin-post/              LinkedIn post development skill
 ```
 
 ## Install on any device (Claude Code)
