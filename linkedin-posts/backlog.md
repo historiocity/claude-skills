@@ -12,20 +12,63 @@ To add an idea, Justin can say "remember this for a post" or paste a link to sav
 
 ---
 
-## 1. The artifact / "book of record" operating model
+## Recommended build order (as of 2026-07-18)
+
+1. **Skill atrophy as a control / model-risk problem** — the most differentiated and genuinely unclaimed angle; a
+   risk-and-regulatory reframe of a talent topic everyone else is stuck on.
+2. **Artifact / "book of record" operating model** — Justin's strongest parked idea; the unfunded precondition
+   nobody's pricing.
+3. **You bought a tool with no plan to monetize it (AI ROI-discipline gap)** — CFO-native, cuts against the
+   "spend more on AI" reflex.
+4. **The succession contradiction / "perpetual junior"** — sharpen past the saturated "don't cut juniors" take to
+   the self-cannibalizing contradiction.
+5. **Cutting ahead of the proof** — lower priority; the productivity-skepticism space is crowded, hold until a
+   distinctive edge appears.
+
+(Shipped so far: *The AI foundation you're cutting — financial services will pay more than it saves*,
+2026-07-18-ai-roi-vs-workforce-cuts.md.)
+
+---
+
+## 1. Skill atrophy is a control-environment and model-risk problem (not just a talent problem)
+- **Claim:** In regulated financial services the human reviewer *is* a control. De-skilling therefore degrades the
+  control environment and inflates model risk — a reviewer who can no longer catch the model's error is a failed
+  control, not just a rusty employee.
+- **Why non-obvious:** The generic "AI erodes skills" take is an HR/talent framing that BCG already owns. Recasting
+  atrophy as a **control-environment / model-risk (SR 11-7-style) issue** is a risk-and-regulatory framing almost
+  no one is using — and it's exactly the language FS risk committees and regulators speak.
+- **Audience:** CRO, Head of Model Risk / Controls, CTO, board risk committee.
+- **Evidence:** BCG de-skilling survey (half of execs observe it; judgment and problem-framing most at risk); model
+  risk governance norms; METR / MIT NANDA on unproven productivity. *Needs a research pass on the model-risk angle.*
+- **Status:** raw — strongest of the *new* recommendations; build next.
+- **Source:** 2026-07-18 session — terms "human in the loop", "control", "model risk".
+
+## 2. The artifact / "book of record" operating model
 - **Claim:** The AI productivity gains firms are banking on are impossible without an enterprise artifact and
   information-management operating model — current architecture diagrams, PRDs, accurate CMDB, cleared requirements
   for current *and* legacy systems — that almost no firm maintains and none is funding.
 - **Why non-obvious:** Everyone says "keep humans in the loop." Almost no one says the AI itself is *starved*
   without a documentation discipline that demands **higher** standards than the pre-AI world — and that this is
-  capex with a return, not overhead. This is the sharpest, most differentiated angle from the 2026-07-18 session.
+  capex with a return, not overhead. The sharpest, most differentiated angle from the 2026-07-18 session.
 - **Audience:** CIO/CTO, Chief Data/Architecture Officer, CFO (funder).
 - **Evidence:** McKinsey — only 7% of orgs are AI-ready, ~85% of AI initiatives fail, post-mortems blame the org
   not the model (https://www.mckinsey.com/capabilities/mckinsey-technology/our-insights/ai-data-readiness-the-key-to-scaling-impact).
 - **Status:** debated / ready-to-build.
 - **Source:** 2026-07-18 session — terms "book of record", "brownfield", "artifacts", "CMDB".
 
-## 2. The succession contradiction / the "perpetual junior"
+## 3. You bought a tool with no plan to monetize it (the AI ROI-discipline gap)
+- **Claim:** Firms aren't getting AI ROI because they hand out licenses without defining expected gains by role,
+  target outputs, or measurable value — a widget with no monetization plan — then act surprised the return didn't
+  show up.
+- **Why non-obvious:** Cuts against the "spend more on AI" reflex and reframes the ROI miss as an operating-model
+  failure, not a technology failure. Concrete and CFO-native. (Justin's original "post 3.")
+- **Audience:** CFO, COO, CIO.
+- **Evidence:** "expensive glorified search" usage pattern; Goldman — no economy-wide AI-productivity link; ~85%
+  of AI initiatives fail. *Needs a fresh research pass for hard ROI numbers.*
+- **Status:** raw.
+- **Source:** 2026-07-18 session — terms "ROI", "licenses", "monetize".
+
+## 4. The succession contradiction / the "perpetual junior"
 - **Claim:** Firms are cutting junior classes by up to two-thirds while sourcing ~62% of their future AI talent
   from those same cohorts — and because AI has absorbed the tasks juniors learned on, even the juniors they keep
   may never become seniors.
@@ -38,32 +81,7 @@ To add an idea, Justin can say "remember this for a post" or paste a link to sav
 - **Status:** debated.
 - **Source:** 2026-07-18 session — terms "succession", "junior pipeline", "62%".
 
-## 3. Skill atrophy is a control-environment and model-risk problem (not just a talent problem)
-- **Claim:** In regulated financial services the human reviewer *is* a control. De-skilling therefore degrades the
-  control environment and inflates model risk — a reviewer who can no longer catch the model's error is a failed
-  control, not just a rusty employee.
-- **Why non-obvious:** The generic "AI erodes skills" take is an HR/talent framing that BCG already owns. Recasting
-  atrophy as a **control-environment / model-risk (SR 11-7-style) issue** is a risk-and-regulatory framing almost
-  no one is using — and it's exactly the language FS risk committees and regulators speak.
-- **Audience:** CRO, Head of Model Risk / Controls, CTO, board risk committee.
-- **Evidence:** BCG de-skilling survey (half of execs observe it; judgment and problem-framing most at risk); model
-  risk governance norms; METR / MIT NANDA on unproven productivity. *Needs a research pass on the model-risk angle.*
-- **Status:** raw — strongest of the *new* recommendations; worth building next.
-- **Source:** 2026-07-18 session — terms "human in the loop", "control", "model risk".
-
-## 4. You bought a tool with no plan to monetize it (the AI ROI-discipline gap)
-- **Claim:** Firms aren't getting AI ROI because they hand out licenses without defining expected gains by role,
-  target outputs, or measurable value — a widget with no monetization plan — then act surprised the return didn't
-  show up.
-- **Why non-obvious:** Cuts against the "spend more on AI" reflex and reframes the ROI miss as an operating-model
-  failure, not a technology failure. Concrete and CFO-native. (Justin's original "post 3.")
-- **Audience:** CFO, COO, CIO.
-- **Evidence:** "expensive glorified search" usage pattern; Goldman — no economy-wide AI-productivity link; ~85%
-  of AI initiatives fail. *Needs a fresh research pass for hard ROI numbers.*
-- **Status:** raw.
-- **Source:** 2026-07-18 session — terms "ROI", "licenses", "monetize".
-
-## 5. (Lower priority) Cutting ahead of the proof
+## 5. Cutting ahead of the proof (lower priority)
 - **Claim:** Banks shed ~15,000 roles in Q1 2026 while posting $47B in profit and no demonstrated economy-wide AI
   productivity gain — the cuts are running ahead of the evidence, and "efficiency" is doing the work of optics.
 - **Why watch it:** The productivity-skepticism space is more crowded (Goldman, MIT NANDA, METR are widely cited),
