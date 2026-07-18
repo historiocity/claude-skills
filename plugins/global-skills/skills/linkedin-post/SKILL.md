@@ -88,8 +88,9 @@ you debate. When you notice that happening, don't lose them and don't cram them 
 
 - **Flag it in the moment.** Say plainly that the material is really several posts, and name the distinct ideas
   you're seeing.
-- **Park the spinoffs in a persistent, cross-session backlog** so they survive to future sessions. Capture each as
-  a structured entry:
+- **Park the spinoffs in the repo backlog** (`linkedin-posts/backlog.md`) so they survive across sessions — this is
+  the durable store, not conversational memory. Justin can also say "remember this for a post" or paste a link at
+  any time, and it gets appended there. Capture each as a structured entry:
   - *handle* — a short name for the idea
   - *claim* — the core assertion in one sharp sentence
   - *why* — what makes it non-obvious, and the likely angle
@@ -102,9 +103,18 @@ you debate. When you notice that happening, don't lose them and don't cram them 
   not a junk drawer of tangents.
 - **Then ask** whether Justin wants to build the next one in sequence now, or come back to it later.
 
-Keep the backlog current: when a post ships, drop its entry; let Justin review, reprioritize, or prune it whenever
-he asks ("what's in the post backlog?"). Persist it through your memory system, but refer to it naturally in
-conversation ("I've got three parked") — don't expose file paths or mechanics.
+Keep the backlog current: when a post ships, move its entry into the finished-post file (below) and delete it from
+the backlog; let Justin review, reprioritize, or prune it whenever he asks ("what's in the post backlog?"). The
+backlog lives at `linkedin-posts/backlog.md`, but refer to it naturally in conversation ("I've got three parked") —
+don't make him think about file mechanics.
+
+## Persisting finished posts
+
+When a post is final, save it to the repo as its own dated Markdown file: `linkedin-posts/YYYY-MM-DD-short-slug.md`.
+Include a short header (date, status, audience, one-line thesis), the post body exactly as it will be published, the
+sources / first-comment block, and a brief notes line (e.g., figures to verify). This is the archive of what
+shipped — one file per post — so past posts, their framing, and their links are always recoverable. Commit finished
+posts and backlog updates to the repo like any other change.
 
 **Linking back to where an idea came from:** you can't store the current conversation's own URL from inside it, so
 don't try to save a live link. Instead, when Justin wants to revisit a parked idea, search the conversation
