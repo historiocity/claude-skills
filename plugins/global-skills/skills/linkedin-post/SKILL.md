@@ -206,24 +206,32 @@ disproportionate weight:
   learned") — those are banned and burn credibility with this audience.
 - **Telegraph the destination.** By the end of the first line or two the reader should know where the piece is
   going and why they should care — not have to reach the end to find out.
+- **Keep it short — roughly two sentences, ~25 words.** Calibrate to what actually fits above the "…more" fold on
+  mobile. The benchmark is a Chamath-style opener: one clause stating the accepted fact, one flipping it, the whole
+  reframe visible before the fold, nothing wasted. If the reframe doesn't fit that space, tighten until it does.
+- **This is non-negotiable for every post.** Whatever else changes, the first ~3 lines must be punchy and pull the
+  reader in. Before delivering, isolate them, read them alone, and confirm they'd make *you* click "…more."
 
 ## Scannable formatting
 
-Executives skim before they commit to reading. Make the skim carry the argument:
+Executives skim before they commit to reading, so the *structure* has to carry the argument — LinkedIn has no
+native rich text, and there is no good way to bold inside a post:
 
-- **Bold the load-bearing observations** so that reading *only* the bold text conveys the full thesis, end to end.
-  Bold the turns and the punchlines, not the supporting detail — over-bolding is the same as no bolding.
-- Because LinkedIn doesn't render Markdown, deliver bold as **Unicode bold characters** in the paste-ready output
-  (rendered, not `**asterisks**`). Note once that Unicode bold degrades screen-reader accessibility, and offer a
-  plain-text version.
+- **Don't use Unicode "bold" characters.** They look like formatting but they break clean copy-paste and screen
+  readers can't read them — a non-starter for a serious professional audience. Markdown `**bold**` doesn't render
+  on LinkedIn either. Assume the post body is plain text, full stop.
+- Get emphasis from **structure, not weight**: short paragraphs, a strong lead sentence on each one, and clear
+  verbal anchors ("First… Second…", "the part no one's pricing:"). A reader skimming only the opening sentence of
+  each paragraph should still get the spine of the argument.
 - Keep paragraphs short and let the hard lines stand alone — but never lapse into broetry (one line per line of
   whitespace), which is a banned tell.
 
 ## Output
 
-Deliver the final post as **copy-paste-ready text** Justin can drop straight into LinkedIn — bold already rendered
-as Unicode bold, ready to publish, not a Markdown draft he has to reformat. Include the supporting **source links**:
-append a short "Sources" block, and note that LinkedIn suppresses reach on posts with outbound links in the body,
-so recommend posting the links as the first comment — but let Justin decide. Length follows the insight: a thorough,
-well-sourced executive post can run long, and that's fine when every sentence is load-bearing; don't cut substance
-to hit an arbitrary word count. His call throughout; you develop and sharpen, he ships.
+Deliver the final post as **one plain-text block Justin can copy and paste once** — no Unicode bold, no Markdown,
+no second block to reassemble, nothing to reformat. Put the **sources at the bottom of that same block** as plain
+URLs (they auto-link on LinkedIn); do not split them into a separate snippet. Note once that LinkedIn suppresses
+reach on posts with outbound links in the body, so Justin *may* prefer to move the sources into the first comment —
+but that's his call, and the default is one paste-ready block with the sources at the end. Length follows the
+insight: a thorough, well-sourced executive post can run long, and that's fine when every sentence is load-bearing;
+don't cut substance to hit an arbitrary word count. You develop and sharpen, he ships.
