@@ -228,10 +228,18 @@ native rich text, and there is no good way to bold inside a post:
 
 ## Output
 
-Deliver the final post as **one plain-text block Justin can copy and paste once** — no Unicode bold, no Markdown,
-no second block to reassemble, nothing to reformat. Put the **sources at the bottom of that same block** as plain
-URLs (they auto-link on LinkedIn); do not split them into a separate snippet. Note once that LinkedIn suppresses
-reach on posts with outbound links in the body, so Justin *may* prefer to move the sources into the first comment —
-but that's his call, and the default is one paste-ready block with the sources at the end. Length follows the
-insight: a thorough, well-sourced executive post can run long, and that's fine when every sentence is load-bearing;
-don't cut substance to hit an arbitrary word count. You develop and sharpen, he ships.
+Deliver the final post as **plain, readable prose Justin can copy and paste once** — **never wrapped in a fenced
+code block** (it renders as a scrolling monospace box he can't use), no Unicode bold, no Markdown styling, nothing
+to reformat. It should look like normal chat text he can lift straight out.
+
+Handle sources according to how Justin actually publishes — ask if you don't know:
+
+- **Native LinkedIn** cannot render inline hyperlinks in the post body; only raw URLs auto-link. So either drop the
+  raw URLs at the very bottom of the same block, or — better for reach, since LinkedIn throttles posts with outbound
+  body links — put them in the first comment.
+- **A rich-text scheduler** (Taplio, Buffer, and similar) *can* render inline anchor links, in which case hyperlink
+  specific in-context words rather than listing URLs.
+
+Either way, keep it to one thing to paste; the sources are never a separate snippet he has to reassemble. Length
+follows the insight: a thorough, well-sourced executive post can run long, and that's fine when every sentence is
+load-bearing; don't cut substance to hit an arbitrary word count. You develop and sharpen, he ships.
