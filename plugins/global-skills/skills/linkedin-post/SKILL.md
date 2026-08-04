@@ -110,11 +110,19 @@ don't make him think about file mechanics.
 
 ## Persisting finished posts
 
-When a post is final, save it to the repo as its own dated Markdown file: `linkedin-posts/YYYY-MM-DD-short-slug.md`.
-Include a short header (date, status, audience, one-line thesis), the post body exactly as it will be published, the
-sources / first-comment block, and a brief notes line (e.g., figures to verify). This is the archive of what
-shipped — one file per post — so past posts, their framing, and their links are always recoverable. Commit finished
-posts and backlog updates to the repo like any other change.
+When a post is final, save it to the repo in two forms, because the archive and the paste-ready copy are different
+jobs:
+
+1. **The archive** — `linkedin-posts/YYYY-MM-DD-short-slug.md`. A short header (date, status, audience, one-line
+   thesis), the post body, the sources, and a brief notes line (e.g., figures to verify). This is the durable
+   record; it is *not* meant to be pasted, since its headers and dividers would come along.
+2. **The paste-ready copy** — plain `.txt`, so Justin can open it, select all, copy, and paste with zero cleanup:
+   - `linkedin-posts/YYYY-MM-DD-short-slug.post.txt` — the post body, and nothing else.
+   - `linkedin-posts/YYYY-MM-DD-short-slug.first-comment.txt` — the sources, and nothing else.
+
+Use plain `.txt` for the paste files, never `.md` (markup/metadata get in the way) and never `.docx` (Word injects
+smart quotes and rich formatting that paste badly into LinkedIn). Commit finished posts and backlog updates to the
+repo like any other change.
 
 **Linking back to where an idea came from:** you can't store the current conversation's own URL from inside it, so
 don't try to save a live link. Instead, when Justin wants to revisit a parked idea, search the conversation
