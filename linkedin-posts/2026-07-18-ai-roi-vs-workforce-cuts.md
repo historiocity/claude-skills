@@ -1,0 +1,44 @@
+# The AI foundation you're cutting — financial services will pay more than it saves
+
+- **Date:** 2026-07-18
+- **Status:** Ready to publish (native LinkedIn — post body, then sources as the first comment)
+- **Audience:** CEO / CFO / CTO in financial services (CTOs are the amplifiers who forward it upward)
+- **Thesis:** The AI ROI financial services is chasing depends on a knowledge foundation — the senior people who hold system context, the junior pipeline that renews them, and the reliable artifacts AI must consume — that firms are simultaneously dismantling and failing to build. The savings are booked this year; the capability bill comes later, and it's bigger.
+
+---
+
+## Post (paste as the post)
+
+Financial services will likely pay more for AI than it saves — and most firms won't notice until the capability is already gone.
+
+Firms are booking headcount cuts as AI savings while dismantling the one thing AI actually needs to work: the knowledge, human and documented, that makes it useful at all.
+
+The cuts are real and industry-wide. Citi is removing 20,000 roles by year-end; JPMorgan says AI has already cut staffing up to 40% in parts of the firm; and it isn't only banks — Morgan Stanley and BlackRock are trimming markets and asset-management teams on the same logic. They fall hardest at the bottom: junior classes cut by up to two-thirds, even as firms draw ~62% of their future AI talent from those same cohorts.
+
+Two things get lost, and neither shows up in the business case.
+
+First, human context. On a regulated, interconnected estate, AI is only as good as the context it's given, and that context isn't in the codebase. It sits with your enterprise architects, solution architects, and platform owners: who knows why a system was built as it was, which dependencies are load-bearing, which "obvious" change trips a regulator. Cut them and it doesn't transfer to the model; it walks out. Cut the juniors too and you sever the pipeline that produces the next generation of them.
+
+Second, the part almost no one is pricing: the artifacts. For AI to genuinely scale your technologists, greenfield or brownfield, it has to consume reliable inputs — current architecture diagrams, PRDs, accurate CMDB records, documented requirements for the systems you run today and the ones you're modernizing. Almost no firm maintains these to that standard. Only 7% of organizations say their data is AI-ready, and roughly 85% of AI initiatives fail to deliver, with the post-mortems blaming the organization, not the model. Starve AI of that substrate and it doesn't scale your people; it produces confident output against systems no one left understands.
+
+Meanwhile, the seniors you kept are de-skilling: BCG finds half of executives already observe it, and rate judgment and problem-framing as the capabilities most at risk — the exact human check you're now leaning on harder.
+
+So the ROI thesis quietly undermines itself. This is not an argument against AI; it's the precondition for the return you've already committed to. Before you set a headcount target, answer three things: which named roles hold context AI can't infer, what artifact standard your estate needs to make AI scalable, and who owns building it. If you can't, you're not cutting cost. You're financing this year's savings with next year's capability.
+
+You can rehire a headcount number in a quarter. You can't rehire twenty years of knowing why a system works. Many companies are about to learn the difference.
+
+---
+
+## First comment (paste right after posting)
+
+Sources:
+- Junior-analyst cuts + Citi / JPMorgan / Morgan Stanley / BlackRock — https://fortune.com/2026/06/07/banks-mass-workforce-cuts-ai-entry-level-jobs-junior-analysts/
+- JPMorgan, staffing down up to 40% in parts of the firm — https://sea.peoplemattersglobal.com/news/strategic-hr/ai-has-cut-staffing-by-up-to-40percent-in-parts-of-jpmorgan-jamie-dimon-50843
+- AI-ready data (7%) + ~85% of AI initiatives fail — https://www.mckinsey.com/capabilities/mckinsey-technology/our-insights/ai-data-readiness-the-key-to-scaling-impact
+- Executives observing de-skilling — https://www.bcg.com/publications/2026/when-everyone-uses-ai-companies-risk-critical-skills
+
+---
+
+## Notes
+- Verify the four figures (40%, two-thirds, ~62%, 7% / ~85%) against the sources before posting — they go out under Justin's name.
+- Opening line is hedged ("will likely pay") deliberately; closer uses the "rehire" reframe broadened to "many companies."
