@@ -1,0 +1,68 @@
+name: Daily Brief
+
+# Copy to .github/workflows/daily-brief.yml in the brief repo.
+
+on:
+  schedule:
+    # 08:00 UTC = 4:00am EDT / 3:00am EST. Cron does not shift for DST;
+    # both land well before 6am, with room for GitHub's scheduler lag.
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: daily-brief
+  cancel-in-progress: false
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      # The canonical skill lives in the public claude-skills marketplace repo.
+      # Checking it out here keeps one source of truth — the brief repo never
+      # carries its own copy to drift out of sync.
+      - name: Fetch the canonical skill
+        uses: actions/checkout@v6
+        with:
+          repository: historiocity/claude-skills
+          path: .skills-src
+          fetch-depth: 1
+
+      - name: Stage the skill for this run
+        run: |
+          mkdir -p .claude/skills
+          cp -r .skills-src/plugins/global-skills/skills/news-brief .claude/skills/
+          rm -rf .skills-src
+
+      - name: Configure git identity
+        run: |
+          git config user.name "news-brief"
+          git config user.email "news-brief@users.noreply.github.com"
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: "/news-brief"
+          claude_args: |
+            --model claude-opus-5
+            --max-turns 200
+            --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Bash(git:*),Bash(gh:*),Bash(date:*),Bash(ls:*),Bash(mkdir:*)"
+
+      # The skill commits and pushes itself. This step only reports what landed,
+      # so a run that wrote an issue but failed to push is visible in the log
+      # rather than silently green.
+      - name: Report result
+        if: always()
+        run: |
+          git log --oneline -1 || true
+          ls -la issues/ | tail -5 || true
