@@ -1,17 +1,42 @@
 name: Daily Brief
 
-# Copy to .github/workflows/daily-brief.yml in the brief repo.
+# Target: the brief is waiting at 5:00am local, every single day.
+#
+# Two mechanisms get it there, because GitHub's cron alone will not.
+# Scheduled workflows on shared runners are delayed under load and are
+# sometimes dropped outright — this repo has already lost a day that way.
+#
+#   1. A DST-aware pair of 5am crons. Cron is always UTC and never shifts
+#      for daylight saving, so both offsets are scheduled and the gate step
+#      drops whichever one is not 5am locally today.
+#   2. Backstop crons through the day. Each one exits immediately if the
+#      day's issue already exists, so they cost seconds on a normal day and
+#      produce the brief on a day the 5am run never fired.
+#
+# Every path is idempotent: the gate refuses to write a second issue for a
+# local day that already has one, so overlapping triggers cannot double-post.
 
 on:
   schedule:
-    # 08:00 UTC = 4:00am EDT / 3:00am EST. Cron does not shift for DST;
-    # both land well before 6am, with room for GitHub's scheduler lag.
-    - cron: "0 8 * * *"
+    # --- 5:00am America/New_York, whichever offset is in force ---
+    - cron: "0 9 * * *"    # 09:00 UTC = 5am EDT (mid-Mar → early Nov)
+    - cron: "0 10 * * *"   # 10:00 UTC = 5am EST (early Nov → mid-Mar)
+    # --- backstops: only act if the day still has no issue ---
+    # Deliberately off the top of the hour; :00 is GitHub's most contended
+    # and most-dropped scheduling slot.
+    - cron: "23 13 * * *"  # ~9:23am EDT
+    - cron: "47 17 * * *"  # ~1:47pm EDT
+    - cron: "11 22 * * *"  # ~6:11pm EDT — last chance for the local day
   workflow_dispatch:
 
 concurrency:
   group: daily-brief
   cancel-in-progress: false
+
+env:
+  # The reader's timezone. Changing this means changing the two 5am cron
+  # lines above to match — they are UTC and cannot read this value.
+  BRIEF_TZ: America/New_York
 
 jobs:
   brief:
@@ -26,10 +51,59 @@ jobs:
         with:
           fetch-depth: 1
 
+      # Decides whether this particular trigger should produce a brief.
+      # Everything downstream is gated on its output, so a run that has
+      # nothing to do finishes green in seconds instead of burning a model
+      # call or writing a duplicate issue.
+      - name: Gate — should this run produce a brief?
+        id: gate
+        run: |
+          set -euo pipefail
+          TODAY="$(TZ="$BRIEF_TZ" date +%F)"
+          LOCAL_NOW="$(TZ="$BRIEF_TZ" date '+%Y-%m-%d %H:%M %Z')"
+          OFFSET="$(TZ="$BRIEF_TZ" date +%z)"
+          SCHEDULE="${{ github.event.schedule }}"
+
+          echo "today=$TODAY" >> "$GITHUB_OUTPUT"
+          echo "Local time now: $LOCAL_NOW (offset $OFFSET)"
+          echo "Trigger: ${SCHEDULE:-manual dispatch}"
+
+          # 1. One issue per local day, no matter how many triggers fire.
+          if [ -f "issues/${TODAY}.html" ]; then
+            echo "Issue for ${TODAY} already exists — nothing to do."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # 2. The two 5am crons are a DST pair. Exactly one of them is 5am
+          #    local on any given date; the other is an hour off and must
+          #    stand down. Backstops and manual dispatch carry no such
+          #    constraint — their job is to fire whenever the day is empty.
+          case "$SCHEDULE" in
+            "0 9 * * *")
+              if [ "$OFFSET" != "-0400" ]; then
+                echo "09:00 UTC is not 5am local today — the 10:00 UTC cron owns it."
+                echo "should_run=false" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              ;;
+            "0 10 * * *")
+              if [ "$OFFSET" != "-0500" ]; then
+                echo "10:00 UTC is not 5am local today — the 09:00 UTC cron owns it."
+                echo "should_run=false" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              ;;
+          esac
+
+          echo "Producing the brief for ${TODAY}."
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+
       # The canonical skill lives in the public claude-skills marketplace repo.
       # Checking it out here keeps one source of truth — the brief repo never
       # carries its own copy to drift out of sync.
       - name: Fetch the canonical skill
+        if: steps.gate.outputs.should_run == 'true'
         uses: actions/checkout@v6
         with:
           repository: historiocity/claude-skills
@@ -37,17 +111,21 @@ jobs:
           fetch-depth: 1
 
       - name: Stage the skill for this run
+        if: steps.gate.outputs.should_run == 'true'
         run: |
           mkdir -p .claude/skills
           cp -r .skills-src/plugins/global-skills/skills/news-brief .claude/skills/
           rm -rf .skills-src
 
       - name: Configure git identity
+        if: steps.gate.outputs.should_run == 'true'
         run: |
           git config user.name "news-brief"
           git config user.email "news-brief@users.noreply.github.com"
 
-      - uses: anthropics/claude-code-action@v1
+      - name: Produce the brief
+        if: steps.gate.outputs.should_run == 'true'
+        uses: anthropics/claude-code-action@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -58,11 +136,124 @@ jobs:
             --max-turns 200
             --allowedTools "WebSearch,WebFetch,Read,Write,Edit,Glob,Bash(git:*),Bash(gh:*),Bash(date:*),Bash(ls:*),Bash(mkdir:*)"
 
-      # The skill commits and pushes itself. This step only reports what landed,
-      # so a run that wrote an issue but failed to push is visible in the log
-      # rather than silently green.
+      # The skill commits and pushes itself. This confirms the issue actually
+      # landed on the default branch, so a run that wrote a file but failed to
+      # push is a red run rather than a silently green one.
+      - name: Verify the issue landed
+        id: verify
+        if: steps.gate.outputs.should_run == 'true'
+        run: |
+          set -euo pipefail
+          TODAY="${{ steps.gate.outputs.today }}"
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          PAGES_ROOT="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}"
+
+          if [ ! -f "issues/${TODAY}.html" ]; then
+            echo "::error::No issue file was written for ${TODAY}."
+            exit 1
+          fi
+
+          git fetch origin "${GITHUB_REF_NAME}" --depth=1
+          if ! git merge-base --is-ancestor HEAD "origin/${GITHUB_REF_NAME}"; then
+            echo "::error::The issue was written but not pushed — HEAD is not on the remote."
+            exit 1
+          fi
+
+          {
+            echo "url=${PAGES_ROOT}/issues/${TODAY}.html"
+            echo "archive=${PAGES_ROOT}/"
+          } >> "$GITHUB_OUTPUT"
+
+          # Story titles, for the notification body.
+          grep -oP '<h3[^>]*>\K[^<]+' "issues/${TODAY}.html" \
+            | sed 's/[[:space:]]*$//' | sed 's/^/- /' > /tmp/titles.txt || true
+          echo "Landed: ${PAGES_ROOT}/issues/${TODAY}.html"
+
+      # Notification one — a GitHub issue. Needs no secrets and no extra app:
+      # GitHub emails the assignee and pushes to the GitHub mobile app. Closed
+      # immediately so the tracker stays clean; the notification still fires.
+      - name: Notify — brief is ready
+        if: steps.gate.outputs.should_run == 'true' && steps.verify.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TODAY="${{ steps.gate.outputs.today }}"
+          URL="${{ steps.verify.outputs.url }}"
+          PRETTY="$(TZ="$BRIEF_TZ" date -d "$TODAY" '+%A, %-d %B %Y')"
+
+          gh label create brief-ready \
+            --description "Notification that a brief was published" \
+            --color 1D76DB 2>/dev/null || true
+
+          {
+            echo "**[Read the brief →](${URL})**"
+            echo
+            echo "In this issue:"
+            echo
+            cat /tmp/titles.txt 2>/dev/null || echo "- (titles unavailable)"
+            echo
+            echo "Archive: ${{ steps.verify.outputs.archive }}"
+          } > /tmp/body.md
+
+          NUM="$(gh issue create \
+            --title "📰 Brief ready — ${PRETTY}" \
+            --body-file /tmp/body.md \
+            --label brief-ready \
+            --assignee "${GITHUB_REPOSITORY_OWNER}" \
+            | grep -oE '[0-9]+$')"
+          gh issue close "$NUM" --reason completed
+          echo "Notified via issue #${NUM}."
+
+      # Notification two — optional phone push, off by default.
+      # Enable it by setting a repository variable named NTFY_TOPIC
+      # (Settings → Secrets and variables → Actions → Variables) to a topic
+      # name of your choosing, then subscribing to that topic in the free
+      # ntfy app. Unset, this step skips silently.
+      - name: Notify — phone push (optional)
+        if: steps.gate.outputs.should_run == 'true' && steps.verify.outcome == 'success' && vars.NTFY_TOPIC != ''
+        run: |
+          set -euo pipefail
+          PRETTY="$(TZ="$BRIEF_TZ" date -d "${{ steps.gate.outputs.today }}" '+%A, %-d %B')"
+          curl -sS \
+            -H "Title: Your brief is ready" \
+            -H "Tags: newspaper" \
+            -H "Click: ${{ steps.verify.outputs.url }}" \
+            -d "${PRETTY} — tap to read." \
+            "https://ntfy.sh/${{ vars.NTFY_TOPIC }}" > /dev/null
+          echo "Pushed to ntfy topic."
+
+      # A failed run must be as loud as a successful one, or a silent
+      # breakage looks identical to a quiet news day.
+      - name: Notify — run failed
+        if: failure() && steps.gate.outputs.should_run == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TODAY="${{ steps.gate.outputs.today }}"
+          RUN="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+          gh label create brief-failed \
+            --description "A brief run failed" --color B60205 2>/dev/null || true
+
+          cat > /tmp/fail.md <<EOF
+          The run for ${TODAY} did not publish. Log: ${RUN}
+
+          A backstop cron will retry later today. If those also fail, the usual
+          causes are an expired \`CLAUDE_CODE_OAUTH_TOKEN\` or a push rejection.
+          EOF
+          sed -i 's/^          //' /tmp/fail.md
+
+          gh issue create \
+            --title "⚠️ Brief failed — ${TODAY}" \
+            --body-file /tmp/fail.md \
+            --label brief-failed \
+            --assignee "${GITHUB_REPOSITORY_OWNER}" || true
+
       - name: Report result
         if: always()
         run: |
+          echo "should_run: ${{ steps.gate.outputs.should_run }}"
           git log --oneline -1 || true
           ls -la issues/ | tail -5 || true

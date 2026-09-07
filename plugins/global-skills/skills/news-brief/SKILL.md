@@ -9,7 +9,7 @@ description: >-
   complete standalone issue on the spot, and in a configured brief repo it additionally archives,
   cross-links, and publishes. Runs unattended on a schedule or interactively on request. A question
   about one specific news story is not a request for the brief — answer that directly instead.
-allowed-tools: WebSearch, WebFetch, Read, Write, Edit, Glob, Bash(git:*), Bash(gh:*), Bash(date:*), Bash(ls:*), Bash(mkdir:*)
+allowed-tools: WebSearch, WebFetch, Read, Write, Edit, Glob, PushNotification, Bash(git:*), Bash(gh:*), Bash(date:*), Bash(ls:*), Bash(mkdir:*), Bash(curl:*)
 ---
 
 # News Brief
@@ -93,6 +93,17 @@ Four tests:
 
 **Thin coverage is not a penalty.** A verifiable, consequential story that few outlets carried is often the most valuable item in the issue. Mark it `Underreported` so the reader can see you found it somewhere other than the front pages.
 
+**A quiet core beat still runs.** The most damaging failure this skill has is not a wrong story — it is an issue full of accurately-reported foreign spot news while the beats the reader actually cares about sit in the footer marked "no movement". That happens because §4's movement rule and §3's update-value test agree that nothing happened, and nothing did; but "no new fact today" and "not worth the reader's attention" are different claims, and only the first one is true.
+
+So: **a core beat with a scheduled catalyst inside two weeks belongs in the body, even with no new fact.** A central bank meeting, a data print, a filing or response deadline, a scheduled operation, a hearing. Write it as a state-of-play piece, tag it `Where things stand`, and say in the first line that there is no new fact today. The reader gets the state of the thing they care about, and the label keeps you honest about what it is.
+
+Two guardrails, because this is a licence that could be abused into padding:
+
+- It applies to beats the config marks core, not to every thread on the watchlist. §4's cap and the movement rule still govern follow-ups.
+- The catalyst must be real and dated. "This is generally important" is not a catalyst; a meeting on the 16th is.
+
+The movement rule governs **threads**. It must never be the reason a core beat is absent from the issue.
+
 ## 4. Follow-ups
 
 Follow-ups need thread history. Without an archive or watchlist, skip this section entirely and fill the issue with new stories — don't fake continuity.
@@ -127,7 +138,17 @@ Each story: **250 words**, plus a **~500-word expansion** behind a "Dig deeper" 
 
 The 250 covers: what happened, how it's known, why it matters, and what to watch next. The expansion adds depth, never restates.
 
-**Divergence.** Where sources disagree, label the outlets and explain the split — whose interests, priors, or national vantage account for it, and which reading the evidence better supports. Say when you can't tell. Distinguish disagreement about *facts* from disagreement about *significance*; they call for different treatment.
+**Divergence.** Where sources disagree, the box exists to resolve the disagreement as far as the evidence allows — not to announce that one exists. "Outlet A says this, outlet B says that, hard to tell" is a failure. It hands the reader the problem you were supposed to do the work on.
+
+Every divergence box carries three things, in this order:
+
+1. **The substance.** Precisely what is in dispute — the number, the sequence, the characterisation, the causal claim. Name the specific point of disagreement, not the general topic. And say which kind it is: a dispute about *facts* (one account is wrong) or about *significance* (both accounts are right and they weight it differently). These call for opposite treatment — the first is adjudicated, the second is explained.
+2. **The cause.** Why these sources land where they do. Whose interest is served, what national or institutional vantage they report from, what each had access to, when each published. Timing is the most commonly missed one: two accounts six days apart may both be accurate and describe a situation that changed. Reach for the mundane explanation before the motivated one.
+3. **What it means for the reader.** Which reading the evidence better supports and why; what to believe in the meantime; and, where possible, what future observation would settle it. This is the part most often dropped and it is the part with the value in it. If the answer is genuinely "unresolved", say what specifically would resolve it — an operation's results, a filing, a print — so the uncertainty is actionable rather than decorative.
+
+Say plainly when you cannot tell, but only after doing 1 and 2. "I can't tell" is a conclusion you earn, not an opening position, and it is never the whole box.
+
+Do not manufacture divergence. If sources agree, there is no box. A box that stages a disagreement to look even-handed is worse than none.
 
 **Confidence.** Every story carries one marker: `Primary source` · `Independent corroboration` · `Single-sourced` · `Unconfirmed`. Three outlets downstream of one wire is single-sourced and must be labeled as such.
 
@@ -186,6 +207,27 @@ Where Pages is serving the repo, the issue is live within a minute or two.
 
 If a commit or push fails, the issue still exists — report the failure and the file path rather than discarding the work. A brief that was written but not pushed is a bad outcome; a brief that was thrown away because git errored is a much worse one.
 
+## 10. Hand over
+
+**The link is the deliverable. The chat is not.**
+
+The moment the issue is published, send a push notification whose body is the clickable URL. That is the handover — the reader taps it and reads the issue. Do it immediately, before writing anything else.
+
+Resolve the URL, never guess it:
+
+- **Pipeline** — the Pages URL, `https://{owner}.github.io/{repo}/issues/YYYY-MM-DD.html`. Take `{owner}` and `{repo}` from the remote, and **match the repository's actual capitalisation** — Pages paths are case-sensitive and the wrong case gives the reader a 404. Verify with a `curl -o /dev/null -w "%{http_code}" -L` before sending; if it isn't 200 yet, Pages is still building — wait and re-check rather than sending a dead link.
+- **Standalone** — the artifact URL if you published one, otherwise the file path.
+- **Repo, no Pages** — the pushed file's URL on the forge, or the path.
+
+Then stop. **Do not summarize the issue in chat.** Do not list the stories, restate the confidence markers, explain the editorial calls, or recap the divergence sections. Every one of those already exists in the issue, written better and in context; repeating them in the terminal makes the reader read the same thing twice and is the single most common way this skill wastes their time.
+
+After the notification, you get **at most two lines** in chat, and only for things that are genuinely not in the issue:
+
+- a failure or degradation the reader has to act on (push failed, Pages not serving, a source that went dark and changed what you could stand up)
+- a question you need answered to tune the next run
+
+Nothing to report means send the notification and say nothing. "Done — notification sent" is one line and is fine. A recap of the issue is not.
+
 ## Setting up the full pipeline
 
 When the user wants the scheduled version — a repo, a cron, an archive, the feedback loop — read `references/repo-setup.md` and walk them through it. `references/config.template.md` is the starting `config.md`, and `references/daily-brief.yml` is the workflow. Don't paraphrase those files from memory; they carry exact paths and settings.
@@ -196,4 +238,4 @@ When the user wants the scheduled version — a repo, a cron, an archive, the fe
 - Never invent a fact, a figure, a quote, or a source. If you can't verify it, say the story is unconfirmed or leave it out.
 - Never manufacture volume. Fewer stories that clear the bar beats more that don't, every time.
 - Never soften coverage of the reader's employer, industry, or locality.
-- Take no action beyond researching, writing, committing, and closing the feedback issues you ingested. Do not open issues, send anything, or modify workflows.
+- Take no action beyond researching, writing, committing, notifying the reader per §10, and closing the feedback issues you ingested. Do not open issues, send anything else, or modify workflows.
