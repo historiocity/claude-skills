@@ -9,7 +9,7 @@ description: >-
   complete standalone issue on the spot, and in a configured brief repo it additionally archives,
   cross-links, and publishes. Runs unattended on a schedule or interactively on request. A question
   about one specific news story is not a request for the brief — answer that directly instead.
-allowed-tools: WebSearch, WebFetch, Read, Write, Edit, Glob, Bash(git:*), Bash(gh:*), Bash(date:*), Bash(ls:*), Bash(mkdir:*)
+allowed-tools: WebSearch, WebFetch, Read, Write, Edit, Glob, PushNotification, Bash(git:*), Bash(gh:*), Bash(date:*), Bash(ls:*), Bash(mkdir:*), Bash(curl:*)
 ---
 
 # News Brief
@@ -178,6 +178,27 @@ Where Pages is serving the repo, the issue is live within a minute or two.
 
 If a commit or push fails, the issue still exists — report the failure and the file path rather than discarding the work. A brief that was written but not pushed is a bad outcome; a brief that was thrown away because git errored is a much worse one.
 
+## 10. Hand over
+
+**The link is the deliverable. The chat is not.**
+
+The moment the issue is published, send a push notification whose body is the clickable URL. That is the handover — the reader taps it and reads the issue. Do it immediately, before writing anything else.
+
+Resolve the URL, never guess it:
+
+- **Pipeline** — the Pages URL, `https://{owner}.github.io/{repo}/issues/YYYY-MM-DD.html`. Take `{owner}` and `{repo}` from the remote, and **match the repository's actual capitalisation** — Pages paths are case-sensitive and the wrong case gives the reader a 404. Verify with a `curl -o /dev/null -w "%{http_code}" -L` before sending; if it isn't 200 yet, Pages is still building — wait and re-check rather than sending a dead link.
+- **Standalone** — the artifact URL if you published one, otherwise the file path.
+- **Repo, no Pages** — the pushed file's URL on the forge, or the path.
+
+Then stop. **Do not summarize the issue in chat.** Do not list the stories, restate the confidence markers, explain the editorial calls, or recap the divergence sections. Every one of those already exists in the issue, written better and in context; repeating them in the terminal makes the reader read the same thing twice and is the single most common way this skill wastes their time.
+
+After the notification, you get **at most two lines** in chat, and only for things that are genuinely not in the issue:
+
+- a failure or degradation the reader has to act on (push failed, Pages not serving, a source that went dark and changed what you could stand up)
+- a question you need answered to tune the next run
+
+Nothing to report means send the notification and say nothing. "Done — notification sent" is one line and is fine. A recap of the issue is not.
+
 ## Setting up the full pipeline
 
 When the user wants the scheduled version — a repo, a cron, an archive, the feedback loop — read `references/repo-setup.md` and walk them through it. `references/config.template.md` is the starting `config.md`, and `references/daily-brief.yml` is the workflow. Don't paraphrase those files from memory; they carry exact paths and settings.
@@ -188,4 +209,4 @@ When the user wants the scheduled version — a repo, a cron, an archive, the fe
 - Never invent a fact, a figure, a quote, or a source. If you can't verify it, say the story is unconfirmed or leave it out.
 - Never manufacture volume. Fewer stories that clear the bar beats more that don't, every time.
 - Never soften coverage of the reader's employer, industry, or locality.
-- Take no action beyond researching, writing, committing, and closing the feedback issues you ingested. Do not open issues, send anything, or modify workflows.
+- Take no action beyond researching, writing, committing, notifying the reader per §10, and closing the feedback issues you ingested. Do not open issues, send anything else, or modify workflows.
