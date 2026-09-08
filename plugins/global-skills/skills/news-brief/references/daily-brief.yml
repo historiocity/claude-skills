@@ -19,13 +19,14 @@ name: Daily Brief
 on:
   schedule:
     # --- 5:00am America/New_York, whichever offset is in force ---
-    - cron: "0 9 * * *"    # 09:00 UTC = 5am EDT (mid-Mar → early Nov)
-    - cron: "0 10 * * *"   # 10:00 UTC = 5am EST (early Nov → mid-Mar)
+    - cron: "7 9 * * *"    # 09:07 UTC = 5:07am EDT (mid-Mar → early Nov)
+    - cron: "7 10 * * *"   # 10:07 UTC = 5:07am EST (early Nov → mid-Mar)
     # --- backstops: only act if the day still has no issue ---
-    # Deliberately off the top of the hour; :00 is GitHub's most contended
-    # and most-dropped scheduling slot.
-    - cron: "23 13 * * *"  # ~9:23am EDT
-    - cron: "47 17 * * *"  # ~1:47pm EDT
+    # Every cron here is off the top of the hour. :00 is GitHub's most
+    # contended slot and the one it drops first — the 5am run was dropped
+    # outright on 7 and 8 Sep while it sat on "0 9".
+    - cron: "41 10 * * *"  # ~6:41am EDT — first catch, ~1.5h behind the 5am
+    - cron: "29 13 * * *"  # ~9:29am EDT
     - cron: "11 22 * * *"  # ~6:11pm EDT — last chance for the local day
   workflow_dispatch:
 
@@ -80,16 +81,16 @@ jobs:
           #    stand down. Backstops and manual dispatch carry no such
           #    constraint — their job is to fire whenever the day is empty.
           case "$SCHEDULE" in
-            "0 9 * * *")
+            "7 9 * * *")
               if [ "$OFFSET" != "-0400" ]; then
-                echo "09:00 UTC is not 5am local today — the 10:00 UTC cron owns it."
+                echo "09:07 UTC is not 5am local today — the 10:07 UTC cron owns it."
                 echo "should_run=false" >> "$GITHUB_OUTPUT"
                 exit 0
               fi
               ;;
-            "0 10 * * *")
+            "7 10 * * *")
               if [ "$OFFSET" != "-0500" ]; then
-                echo "10:00 UTC is not 5am local today — the 09:00 UTC cron owns it."
+                echo "10:07 UTC is not 5am local today — the 09:07 UTC cron owns it."
                 echo "should_run=false" >> "$GITHUB_OUTPUT"
                 exit 0
               fi
