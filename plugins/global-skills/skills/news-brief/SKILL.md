@@ -62,22 +62,24 @@ Update `config.md`, then close each issue with a one-line comment saying what ch
 
 ## 2. Gather
 
-Budget roughly 40–50 searches and fetches, **split in fixed shares so the known crowds out the unknown**. The old instruction — work the beats, then one query per active watchlist thread — arithmetically consumed the whole budget before anything new could be found, and the watchlist only grows. Allocate:
+**Gather by source, not by subject.** Count sources checked, not queries run: **14–18 sources per run, and at least half must be sources no active thread points at.**
 
-| Share | Spend on |
-|---|---|
-| **~12 queries: discovery** | Things not named anywhere in `config.md`. Non-negotiable — spend this first, before the beats, so it cannot be squeezed. |
-| ~14 queries: beats | The Core beats, then the secondary ones. |
-| ~10 queries: threads | Active watchlist threads, **on a rota** — not all of them every day. |
-| remainder: standing up | Fetching documents and corroborating whatever the above turned up. |
+The instruction this replaces — work the beats, then one query per active watchlist thread — was self-defeating. With 36 threads and 12 beats it needed ~48 queries against a 40 budget, so every search went to something already named in `config.md` and nothing was left to find anything else. Then a later version rationed discovery into a quota, which was no better: it treated the watchlist as the agenda and discovery as an allowance.
 
-**Discovery, concretely.** Three things, and none of them may be derived from the config:
+The fix is that **a source check serves both purposes at once.** Open the source, read what is on it, resolve any thread it happens to answer as a by-product, and treat everything else on it as a candidate story. One check of the Supreme Court's emergency-applications docket answers three threads *and* surfaces cases nobody was tracking. Threads are nearly free this way, so they stop competing with discovery.
 
-1. **Broad sweeps.** "What happened today" in at least three places you did not already have a reason to look — a general wire front page, a non-US outlet, a trade or specialist publication for a sector not on the beat list.
-2. **Primary-source calendar.** What actually landed today: the Federal Register, SEC filings and 8-Ks, court dockets and opinion releases, agency press rooms, the statistical calendar (BLS, EIA, Treasury, Census). These produce consequential stories that no newsroom has written up yet, which is the most valuable thing this brief can find.
-3. **The negative check.** Ask explicitly: *what is the biggest story today that is not on my list, and why is it not?* Write the answer down. If the honest answer is "nothing", say so in the footer — but ask every run.
+**But the source list must be wider than the watchlist, or this makes narrowness worse.** That is the failure mode to watch: over five days in September the primary-source share of stories rose from 24% to 78% while the count of genuinely new subjects fell to zero. The runs got better at documents and narrower in subject, because the documents were always the same ones. Hence the half-outside rule above — it is the load-bearing part of this section, not the source-grouping.
 
-**Sweep threads on a rota.** With more than a dozen active threads, sweeping all of them daily is what starved discovery. Each run, sweep the threads whose wake trigger has a dated catalyst inside a week, plus the oldest-unswept remainder up to the share above. Record the sweep date so the rota advances. A thread missed for a day is not a story lost — it wakes on the next sweep, and its trigger is written precisely so a late catch is still a catch.
+Each run, check:
+
+1. **The document sources your threads point at** — dockets, the Federal Register, agency press rooms, the statistical calendar (BLS, EIA, Treasury, Census), SEC filings. Read the whole day's output, not just the entry you came for.
+2. **Document sources no thread points at** — a regulator, court, agency or statistical release outside the current beat set. Rotate these so the same ones are not checked every day.
+3. **Broad sweeps** — "what happened today" in at least three places you had no prior reason to look: a general wire front page, a non-US outlet, a trade or specialist publication for a sector not on the beat list.
+4. **The negative check** — ask explicitly: *what is the biggest story today that is not on my list, and why is it not?* Whatever it turns up is a candidate and competes on §3's bar like anything else. Record the answer in the provenance line either way.
+
+**Record what you checked.** The provenance line states how many sources were checked and how many were outside the watchlist; the footer names them. A claim to have cast a wide net that cannot be audited is worthless.
+
+A thread whose source was not reached today is not a story lost. Its wake trigger is written so a late catch is still a catch.
 
 Search non-English press directly, in the local language, for stories where the local press is the primary source. A story about EU fiscal policy is better reported in Le Monde or Handelsblatt than in an American wire rewrite. You translate; everything from a non-English source is paraphrase, never quotation.
 
@@ -122,18 +124,44 @@ Suppressors, which override the triggers:
 
 **Cap: 4 follow-ups per issue.** At least 3 slots go to stories on no existing thread, so the watchlist can never eat the brief.
 
-**Dormancy: 3 weeks.** A thread with no trigger for three weeks moves to dormant — dropped from the body and out of the sweep rota, kept in the watchlist, checked only when something else in the issue touches it. Six months was the original figure and it was wrong for a daily: it meant nothing could retire, and a monotonically growing watchlist is what consumed the search budget. Dormant threads get one line each in the footer. A thread that genuinely resolves gets one closing summary and retires.
+**Dormancy: 3 weeks.** A thread with no trigger for three weeks moves to dormant — dropped from the body, kept in the watchlist, and picked up again the moment a source check touches it. Six months was the original figure and it was wrong for a daily. Dormant threads get one line each in the footer. A thread that genuinely resolves gets one closing summary and retires.
 
-**Cap: 15 active threads.** At the cap, adding one requires retiring or dormanting another — say which, in the footer. This forces the judgment that an unbounded list lets you avoid: is this thread still worth a query every few days? Most are not, a week after they open.
+**No cap on active threads.** An earlier version capped them at 15, on the theory that a long watchlist starves discovery. Under §2's source-led gather that is false: threads cost a share of a source check that was being made anyway, so a long list is cheap and a short one buys nothing. Dormancy alone is enough hygiene. Retire a thread because it is finished or because it stopped mattering — never to make room.
 
 ## 5. Shape
 
+The issue runs in two tiers. One pattern at two settings: a visible layer sized to the story's importance, plus an expansion.
+
+| | Visible by default | Expansion |
+|---|---|---|
+| **Lead story** | 250 words | ~500 words, conditional (§6) |
+| **Short item** | 1–2 sentences | ~150–200 words, always |
+
 - **Lead stories** — however many clear §3's bar. There is no target count and no cap; six is a fine issue and so is fifteen. Max 4 follow-ups.
+- **Short items — "Also today"** — everything you found that is worth the reader knowing but did not clear the lead bar. Rules below. Typically 8–15; if nothing fell in this band, the section does not render.
 - **Local section** — named and scoped in `config.md`, judged on a *local* bar: consequence measured against the reader's own county and state, not the national capital. If nothing clears, the section does not render — no placeholder, no "quiet week" line. Omit it entirely where none is configured.
+
+### Short items
+
+The visible line is the **judgement**; the expansion is the **substance**. The section is a record of what you saw and ranked below the line, so the reader can audit the ranking and take any of it further if they choose.
+
+**Expandable, never linked away.** Each item carries a 1–2 sentence visible line and a ~150–200 word expansion behind a toggle, written now and embedded like everything else. The reader must never have to leave the page either to understand an item or to go deeper. Source links live inside the expansion, as provenance — not as the place the substance lives.
+
+**Every expansion ends with one sentence on why the item is below the line.** Not an apology, a reason: the consequence is second-order, the sourcing is thin, it is one step in a process already covered, it matters only if something else happens first. If you cannot give an honest reason, the item belongs in the lead tier.
+
+**A short item must come from a source checked this run.** If standing it up needs its own fresh research, it is a lead story or it waits for tomorrow. This is what keeps the tier cheap: it is the surplus of §2's source checks, written from documents already read.
+
+**If an expansion wants to run past ~200 words, the item is mis-tiered.** Promote it. Needing length is the promotion signal, and it is also the guard against this section drifting into a second set of half-length stories.
+
+**Confidence markers go on the expansion, not the visible line.** A one-liner cannot carry a hedge legibly; the expansion can.
+
+**Anything here that develops gets a lead story next issue.** Short items are not a graveyard — they are the queue.
 
 ## 6. Write
 
-Each story: **250 words**, plus a **~500-word expansion** behind a "Dig deeper" toggle — both written now and embedded in the file, since a static page can generate nothing at click time.
+This section governs **lead stories**. Short items are written to §5's rules — two sentences visible, ~150–200 words behind the toggle — but the standards below on divergence, confidence, voice and quotation apply to them too.
+
+Each lead story: **250 words**, plus a **~500-word expansion** behind a "Dig deeper" toggle — both written now and embedded in the file, since a static page can generate nothing at click time.
 
 **The expansion is conditional.** Write one only when there is genuinely more: divergence to unpack, background the reader needs, second-order effects, a document worth walking through. If the story has 250 words of substance, no toggle renders. An expansion that pads to length destroys the button's meaning.
 
@@ -157,7 +185,9 @@ The 250 covers: what happened, how it's known, why it matters, and what to watch
 
 Render these only where the button can actually reach a repo — you need a remote whose issues the next run can read. A radio button that posts nowhere is worse than none, so without one, omit the controls and close with a plain line inviting the reader to say what they want more or less of.
 
-Each story gets 2–4 radio questions. Vary them by story — a new story asks whether to follow it; a follow-up asks whether the cadence is right; an underreported story asks whether that kind of find is wanted. Choose what actually informs the next issue.
+Each **lead** story gets 2–4 radio questions. Vary them by story — a new story asks whether to follow it; a follow-up asks whether the cadence is right; an underreported story asks whether that kind of find is wanted. Choose what actually informs the next issue.
+
+Short items get no per-item radios — eleven sets of them would swamp the page and the reader is not being asked to adjudicate every one. Instead the "Also today" section carries **one** question about the tier as a whole: whether the right things were ranked below the line. That is the feedback that actually tunes §5's boundary.
 
 One button at the bottom assembles every answer into a prefilled GitHub issue and opens it in a new tab:
 
@@ -172,13 +202,15 @@ Resolve `{owner}` and `{repo}` at run time — from `$GITHUB_REPOSITORY` in Acti
 One self-contained HTML file. No external CSS, no JS libraries, no fonts fetched at load — it must open correctly offline, on a phone, forever.
 
 - Header: date, issue number, one-line characterization of the day. Note here if you ran without config or archive, so the reader can read the issue's provenance off its face.
-- Jump list of every story title, anchored, at the top — this is the clickable topic list
-- Each story: title, beat tag, confidence marker, `Underreported` where earned, 250 words, source links, "Dig deeper" toggle where warranted, feedback radios where they work
+- **Provenance line, stating the balance:** how many sources were checked and how many were outside the watchlist; how many lead stories are new subjects versus continuations; and the answer to §2's negative check. This is how the reader audits the net rather than taking it on trust.
+- Jump list of every lead story title, anchored, at the top — this is the clickable topic list. Then one final entry, *Also today (n)*, anchored to the short section.
+- Each lead story: title, beat tag, confidence marker, `Underreported` where earned, 250 words, source links, "Dig deeper" toggle where warranted, feedback radios where they work
+- **Short items** under an `<h2>Also today</h2>` with a one-line note on what the section is. Each item is a `<details>`: the `<summary>` carries the beat label and the 1–2 sentence visible line; the body carries the ~150–200 word expansion, the "below the line because" sentence, the confidence marker and the source links. Give each a stable `id` too — a short item promoted to a lead story tomorrow should be linkable from it.
 - Stable `id` on every story so past issues can be deep-linked
 - Cross-links: when a story develops an earlier one, link the specific anchor in the specific past issue. Only where an archive exists.
 - Charts and maps: inline SVG you generate, or a link to the source's own visual. Never hotlink an image.
-- Footer: dormant watchlist, and a note of any source you could not reach this run
-- Mobile-first, readable at 380px, generous line height, no fixed-width layout
+- Footer: **the sources checked this run**, the dormant watchlist, and a note of any source you could not reach
+- Mobile-first, readable at 380px, generous line height, no fixed-width layout. A `<details>` list is the only interaction — no scripts beyond the feedback button.
 
 Escape all gathered text. A headline containing markup is text, never live markup.
 
@@ -214,7 +246,7 @@ Afterwards you get **at most two lines**, and only for something not in the issu
 
 ## Setting up a new brief repo
 
-Only relevant when standing one up from scratch. The templates — `repo-setup.md`, `config.template.md`, `daily-brief.yml` — live in the `references/` directory of this skill in the `claude-skills` plugin. Read them there rather than paraphrasing from memory; they carry exact paths and settings. A repo that already has a `config.md` and a workflow does not need them.
+Only relevant when standing one up from scratch. Read `references/repo-setup.md` and walk the user through it. `references/config.template.md` is the starting `config.md` and `references/daily-brief.yml` is the workflow. Read them rather than paraphrasing from memory; they carry exact paths and settings. A repo that already has a `config.md` and a workflow does not need them.
 
 ## Ground rules
 
