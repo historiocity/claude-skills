@@ -62,7 +62,22 @@ Update `config.md`, then close each issue with a one-line comment saying what ch
 
 ## 2. Gather
 
-Budget roughly 25–40 searches and fetches. Work the beats, plus one targeted query per active watchlist thread against its wake trigger — that is the whole point of writing wake triggers, so the sweep stays cheap as the list grows.
+Budget roughly 40–50 searches and fetches, **split in fixed shares so the known crowds out the unknown**. The old instruction — work the beats, then one query per active watchlist thread — arithmetically consumed the whole budget before anything new could be found, and the watchlist only grows. Allocate:
+
+| Share | Spend on |
+|---|---|
+| **~12 queries: discovery** | Things not named anywhere in `config.md`. Non-negotiable — spend this first, before the beats, so it cannot be squeezed. |
+| ~14 queries: beats | The Core beats, then the secondary ones. |
+| ~10 queries: threads | Active watchlist threads, **on a rota** — not all of them every day. |
+| remainder: standing up | Fetching documents and corroborating whatever the above turned up. |
+
+**Discovery, concretely.** Three things, and none of them may be derived from the config:
+
+1. **Broad sweeps.** "What happened today" in at least three places you did not already have a reason to look — a general wire front page, a non-US outlet, a trade or specialist publication for a sector not on the beat list.
+2. **Primary-source calendar.** What actually landed today: the Federal Register, SEC filings and 8-Ks, court dockets and opinion releases, agency press rooms, the statistical calendar (BLS, EIA, Treasury, Census). These produce consequential stories that no newsroom has written up yet, which is the most valuable thing this brief can find.
+3. **The negative check.** Ask explicitly: *what is the biggest story today that is not on my list, and why is it not?* Write the answer down. If the honest answer is "nothing", say so in the footer — but ask every run.
+
+**Sweep threads on a rota.** With more than a dozen active threads, sweeping all of them daily is what starved discovery. Each run, sweep the threads whose wake trigger has a dated catalyst inside a week, plus the oldest-unswept remainder up to the share above. Record the sweep date so the rota advances. A thread missed for a day is not a story lost — it wakes on the next sweep, and its trigger is written precisely so a late catch is still a catch.
 
 Search non-English press directly, in the local language, for stories where the local press is the primary source. A story about EU fiscal policy is better reported in Le Monde or Handelsblatt than in an American wire rewrite. You translate; everything from a non-English source is paraphrase, never quotation.
 
@@ -107,7 +122,9 @@ Suppressors, which override the triggers:
 
 **Cap: 4 follow-ups per issue.** At least 3 slots go to stories on no existing thread, so the watchlist can never eat the brief.
 
-**Dormancy: 6 months.** A thread with no trigger for six months moves to dormant — dropped from the body, kept in the watchlist, still swept each run against its wake trigger, and back in the body the instant it fires. Dormant threads get one line each in the footer. A thread that genuinely resolves gets one closing summary and retires.
+**Dormancy: 3 weeks.** A thread with no trigger for three weeks moves to dormant — dropped from the body and out of the sweep rota, kept in the watchlist, checked only when something else in the issue touches it. Six months was the original figure and it was wrong for a daily: it meant nothing could retire, and a monotonically growing watchlist is what consumed the search budget. Dormant threads get one line each in the footer. A thread that genuinely resolves gets one closing summary and retires.
+
+**Cap: 15 active threads.** At the cap, adding one requires retiring or dormanting another — say which, in the footer. This forces the judgment that an unbounded list lets you avoid: is this thread still worth a query every few days? Most are not, a week after they open.
 
 ## 5. Shape
 
@@ -197,7 +214,7 @@ Afterwards you get **at most two lines**, and only for something not in the issu
 
 ## Setting up a new brief repo
 
-Only relevant when standing one up from scratch. Read `references/repo-setup.md` and walk the user through it. `references/config.template.md` is the starting `config.md` and `references/daily-brief.yml` is the workflow. Read them rather than paraphrasing from memory; they carry exact paths and settings. A repo that already has a `config.md` and a workflow does not need them.
+Only relevant when standing one up from scratch. The templates — `repo-setup.md`, `config.template.md`, `daily-brief.yml` — live in the `references/` directory of this skill in the `claude-skills` plugin. Read them there rather than paraphrasing from memory; they carry exact paths and settings. A repo that already has a `config.md` and a workflow does not need them.
 
 ## Ground rules
 
