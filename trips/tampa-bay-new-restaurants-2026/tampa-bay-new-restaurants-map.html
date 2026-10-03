@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tampa Bay Dinner Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+
+
+/* Layout: one reading column; the comparison table and the bay map get the full width. */
+:root{
+  --paper:#f4f6f5; --card:#ffffff; --ink:#18232a; --muted:#5a6a72; --line:#d9e0e0;
+  --bay:#0f5a6b; --bay-soft:#e2eef0; --ember:#b8562e; --ember-soft:#f6e6dc;
+  --water:#cfe1e6; --land:#f7f5ef; --landline:#b9c6c4;
+  --display:"Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#11181c; --card:#172126; --ink:#e7eeee; --muted:#9db0b5; --line:#2a3a40;
+  --bay:#6fc3d1; --bay-soft:#173339; --ember:#f08a5d; --ember-soft:#3a2419;
+  --water:#0e2a33; --land:#1d2a2f; --landline:#3c5158; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#11181c; --card:#172126; --ink:#e7eeee; --muted:#9db0b5; --line:#2a3a40;
+  --bay:#6fc3d1; --bay-soft:#173339; --ember:#f08a5d; --ember-soft:#3a2419;
+  --water:#0e2a33; --land:#1d2a2f; --landline:#3c5158; color-scheme:dark }
+
+html,body{height:100%;margin:0;background:var(--paper);color:var(--ink);font:14px/1.45 var(--body)}
+body{display:flex;flex-direction:column}
+.bar{padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;border-bottom:1px solid var(--line);background:var(--card)}
+.bar h1{font:400 26px/1 var(--display);margin:0}
+.bar ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 16px;margin:0;padding:0}
+.bar a{color:var(--ink);font-weight:600}
+.qs{font:700 12px/1 var(--mono);color:var(--ember)}
+.where{color:var(--muted);font-size:12px}
+
+.map-shell{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--water)}
+.map-shell #map{height:min(70vh,620px);width:100%;background:var(--water)}
+.map-shell.full{position:fixed;inset:0;z-index:2000;border-radius:0;border:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.map-shell.full #map{height:100%}
+.map-btn{position:absolute;top:12px;right:12px;z-index:1000;font:600 13px/1 var(--body);padding:9px 12px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.map-shell.full .map-btn{top:calc(12px + env(safe-area-inset-top,0px))}
+.map-btn:focus-visible{outline:2px solid var(--bay);outline-offset:2px}
+.pin{display:grid;place-items:center;width:38px;height:38px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--ember);border:2px solid var(--card);box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.pin span{transform:rotate(45deg);font:700 12px/1 var(--mono);color:#fff}
+.pin-label{font:600 12px/1.2 var(--body);color:var(--ink);background:var(--card);padding:3px 6px;border-radius:4px;border:1px solid var(--line);white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--card);color:var(--ink)}
+.leaflet-popup-content{margin:14px 16px;font:14px/1.45 var(--body);min-width:230px}
+.pop h4{margin:0 0 2px;font:400 22px/1.1 var(--display)}
+.pop .r{font:700 12px/1 var(--mono);color:var(--ember);letter-spacing:.04em;text-transform:uppercase}
+.pop p{margin:8px 0}
+.pop .links{display:flex;gap:12px;flex-wrap:wrap}
+.pop a{color:var(--bay);font-weight:600}
+.leaflet-container a.leaflet-popup-close-button{color:var(--muted)}
+.leaflet-control-attribution{font-size:10px}
+.leaflet-bar a{background:var(--card);color:var(--ink);border-bottom-color:var(--line)}
+
+.map-shell{flex:1;border:0;border-radius:0}
+.map-shell #map{height:100%}
+</style></head><body>
+<div class="bar"><h1>Tampa Bay Dinner Map</h1><ul><li><span class="qs">9.0</span> <a href="#" data-pin="Mei">Mei</a> <span class="where">Downtown St. Petersburg</span></li><li><span class="qs">9.0</span> <a href="#" data-pin="Lumbre">Lumbre</a> <span class="where">North Hyde Park, Tampa (Rome Collective)</span></li><li><span class="qs">8.7</span> <a href="#" data-pin="Rio Izakaya">Rio Izakaya</a> <span class="where">Westshore Marina District, South Tampa</span></li><li><span class="qs">8.3</span> <a href="#" data-pin="Marcel St. Pete">Marcel St. Pete</a> <span class="where">Historic Uptown, St. Petersburg</span></li><li><span class="qs">8.0</span> <a href="#" data-pin="Tommy&#x27;s Chophouse">Tommy&#x27;s Chophouse</a> <span class="where">Ybor City, Tampa</span></li></ul></div>
+<div class="map-shell"><button class="map-btn" id="expand" type="button" aria-pressed="false">Expand map</button><div id="map" role="region" aria-label="Map of the five restaurants"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(function(){
+  var PICKS = [{"name": "Mei", "lat": 27.76768, "lng": -82.637, "rating": 9.0, "summary": "K\u014dsen's former chef de cuisine cooking French food through a Japanese lens, with house dry-aged duck and an 8-seat, 10-course chef's counter.", "yelp": "https://www.yelp.com/biz/mei-st-petersburg", "website": "https://www.mei-restaurant.com/", "gmaps": "https://www.google.com/maps/search/?api=1&query=Mei+320+3rd+St+S%2C+St.+Petersburg%2C+FL+33701", "area": "Downtown St. Petersburg", "yelpExact": true}, {"name": "Lumbre", "lat": 27.94618, "lng": -82.47668, "rating": 9.0, "summary": "The Michelin-starred Rocca team's wood-fire Spanish kitchen: Ib\u00e9rico pork collar off the hearth, pan con tomate on bread baked daily, and a 14-gin G&T bar.", "yelp": "https://www.yelp.com/biz/lumbre-tampa", "website": "https://www.lumbretampa.com/", "gmaps": "https://www.google.com/maps/search/?api=1&query=Lumbre+220+N+Rome+Ave%2C+Tampa%2C+FL+33606", "area": "North Hyde Park, Tampa (Rome Collective)", "yelpExact": true}, {"name": "Rio Izakaya", "lat": 27.89155, "lng": -82.52973, "rating": 8.7, "summary": "A serious yakitori counter grilling 14 chicken cuts over Japanese white charcoal, plus dry-aged nigiri and a 13-course yakitori omakase for $87.", "yelp": "https://www.yelp.com/biz/rio-izakaya-tampa-2", "website": "https://www.rioiza.com/", "gmaps": "https://www.google.com/maps/search/?api=1&query=Rio+Izakaya+5232+Bridge+St%2C+Tampa%2C+FL+33611", "area": "Westshore Marina District, South Tampa", "yelpExact": true}, {"name": "Marcel St. Pete", "lat": 27.78445, "lng": -82.64643, "rating": 8.3, "summary": "Burgundy-born chef Jeremy Duclut's second Marcel (after Sarasota's acclaimed Marcel DW): rabbit pot pie \u00e0 la moutarde, sweetbread gratin and scallops in a vaulted room with a long bistro patio.", "yelp": "https://www.yelp.com/search?find_desc=Marcel+St.+Pete&find_loc=St.+Petersburg%2C+FL", "website": "https://dinemarcel.com/st-pete/st-petersburg/", "gmaps": "https://www.google.com/maps/search/?api=1&query=Marcel+St.+Pete+1225+Dr.+M.L.K.+Jr.+St+N%2C+St.+Petersburg%2C+FL+33701", "area": "Historic Uptown, St. Petersburg", "yelpExact": false}, {"name": "Tommy's Chophouse", "lat": 27.96037, "lng": -82.44091, "rating": 8.0, "summary": "Charleston's Burwell's founder brings an independent Wagyu steakhouse to the 1910s Kress building, with a former bank vault as its private dining room.", "yelp": "https://www.yelp.com/search?find_desc=Tommy%27s+Chophouse&find_loc=Ybor+City%2C+Tampa%2C+FL", "website": "https://www.tommyschophouse.com/", "gmaps": "https://www.google.com/maps/search/?api=1&query=Tommy%27s+Chophouse+1622+E+7th+Ave%2C+Tampa%2C+FL+33605", "area": "Ybor City, Tampa", "yelpExact": false}];
+  var COUNTIES = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Sumter"},"geometry":{"type":"Polygon","coordinates":[[[-81.9542,28.9601],[-81.9536,28.8209],[-81.9576,28.3452],[-82.0558,28.3128],[-82.0547,28.4784],[-82.0545,28.5214],[-82.2082,28.5721],[-82.2631,28.6676],[-82.1708,28.7902],[-82.3117,28.9604],[-81.9542,28.9601]]]}},{"type":"Feature","properties":{"name":"Pasco"},"geometry":{"type":"Polygon","coordinates":[[[-82.6787,28.4335],[-82.6006,28.4339],[-82.2534,28.4348],[-82.2533,28.4785],[-82.0547,28.4784],[-82.0558,28.3128],[-82.1062,28.2592],[-82.1059,28.1716],[-82.644,28.1733],[-82.6497,28.1733],[-82.6512,28.1733],[-82.8051,28.1722],[-82.7978,28.1878],[-82.7626,28.219],[-82.7645,28.2201],[-82.7641,28.2443],[-82.7591,28.254],[-82.7462,28.2612],[-82.7328,28.2919],[-82.7355,28.3004],[-82.7315,28.3251],[-82.7158,28.3455],[-82.7061,28.3681],[-82.7063,28.4013],[-82.6974,28.4202],[-82.6841,28.428],[-82.6787,28.4335]]]}},{"type":"Feature","properties":{"name":"Manatee"},"geometry":{"type":"Polygon","coordinates":[[[-82.6428,27.3897],[-82.6751,27.4243],[-82.6918,27.4372],[-82.691,27.4443],[-82.7078,27.4876],[-82.7145,27.5004],[-82.7245,27.5136],[-82.743,27.5311],[-82.7457,27.5388],[-82.7424,27.5394],[-82.7081,27.5235],[-82.7106,27.5017],[-82.7068,27.4984],[-82.6904,27.4964],[-82.6864,27.4972],[-82.6869,27.508],[-82.6836,27.5131],[-82.6746,27.5196],[-82.662,27.5228],[-82.6507,27.5231],[-82.646,27.5335],[-82.6321,27.5519],[-82.612,27.5712],[-82.613,27.5828],[-82.6127,27.5833],[-82.6117,27.5853],[-82.5965,27.594],[-82.5846,27.596],[-82.5706,27.6089],[-82.5657,27.6157],[-82.5585,27.6387],[-82.5545,27.6451],[-82.5495,27.6456],[-82.5249,27.6454],[-82.5247,27.6454],[-82.0543,27.6464],[-82.0558,27.3383],[-82.0565,27.2078],[-82.2536,27.2089],[-82.2523,27.3862],[-82.6428,27.3897]]]}},{"type":"Feature","properties":{"name":"Hernando"},"geometry":{"type":"Polygon","coordinates":[[[-82.0547,28.4784],[-82.2533,28.4785],[-82.2534,28.4348],[-82.6006,28.4339],[-82.6787,28.4335],[-82.6778,28.4344],[-82.6748,28.442],[-82.6804,28.4572],[-82.6724,28.4647],[-82.6651,28.4844],[-82.6645,28.4888],[-82.6664,28.4973],[-82.6701,28.5008],[-82.6694,28.5199],[-82.668,28.5282],[-82.6637,28.5302],[-82.6567,28.5448],[-82.6617,28.5497],[-82.6616,28.5541],[-82.657,28.568],[-82.6541,28.5908],[-82.6641,28.6066],[-82.6566,28.6237],[-82.6585,28.6368],[-82.6542,28.6684],[-82.6464,28.6944],[-82.4184,28.6949],[-82.4177,28.6659],[-82.2631,28.6676],[-82.2082,28.5721],[-82.0545,28.5214],[-82.0547,28.4784]]]}},{"type":"Feature","properties":{"name":"Polk"},"geometry":{"type":"Polygon","coordinates":[[[-81.8189,28.3617],[-81.6573,28.3471],[-81.6572,28.2592],[-81.5513,28.249],[-81.5241,28.201],[-81.5242,28.1428],[-81.4556,28.1429],[-81.4553,28.0854],[-81.3755,28.0851],[-81.3787,28.0117],[-81.3087,27.9219],[-81.3019,27.8621],[-81.2081,27.8211],[-81.1315,27.6494],[-81.1422,27.6432],[-81.5633,27.6466],[-82.0543,27.6464],[-82.054,27.8507],[-82.0564,28.0804],[-82.0563,28.1716],[-82.1059,28.1716],[-82.1062,28.2592],[-82.0558,28.3128],[-81.9576,28.3452],[-81.8189,28.3617]]]}},{"type":"Feature","properties":{"name":"Pinellas"},"geometry":{"type":"MultiPolygon","coordinates":[[[[-82.8216,27.9644],[-82.8298,27.9685],[-82.8286,28.0198],[-82.823,28.0307],[-82.8231,28.0448],[-82.8263,28.0535],[-82.8318,28.0629],[-82.8363,28.0732],[-82.8332,28.0822],[-82.8305,28.0853],[-82.8261,28.0838],[-82.8231,28.0683],[-82.8183,28.0576],[-82.8134,28.0372],[-82.8152,28.0125],[-82.8214,28.0084],[-82.8218,28.0025],[-82.8172,27.9921],[-82.8152,27.9737],[-82.8216,27.9644]]],[[[-82.679,27.6961],[-82.6793,27.6947],[-82.6937,27.7002],[-82.7136,27.6987],[-82.7188,27.692],[-82.723,27.6712],[-82.7216,27.6639],[-82.7163,27.6514],[-82.7126,27.6466],[-82.6981,27.6389],[-82.705,27.6253],[-82.7331,27.613],[-82.7366,27.6173],[-82.7373,27.6231],[-82.7378,27.6268],[-82.7391,27.6369],[-82.738,27.7068],[-82.7403,27.7182],[-82.7462,27.7313],[-82.7537,27.7363],[-82.7609,27.7452],[-82.77,27.7679],[-82.7831,27.7838],[-82.7902,27.7916],[-82.8204,27.8137],[-82.8286,27.8223],[-82.8465,27.8543],[-82.8491,27.8632],[-82.8511,27.8863],[-82.8478,27.9102],[-82.8409,27.9372],[-82.8314,27.9621],[-82.8249,27.9602],[-82.822,27.9569],[-82.8308,27.9309],[-82.8385,27.9091],[-82.8322,27.9092],[-82.8207,27.9273],[-82.8087,27.9531],[-82.8055,27.9602],[-82.7978,27.9906],[-82.7926,28.0112],[-82.7926,28.0323],[-82.7827,28.0559],[-82.7838,28.1063],[-82.7822,28.1203],[-82.7813,28.1276],[-82.7866,28.145],[-82.7907,28.1525],[-82.799,28.1518],[-82.8085,28.1548],[-82.8051,28.1722],[-82.6512,28.1733],[-82.6486,28.0386],[-82.6486,27.9663],[-82.7165,27.9584],[-82.7205,27.9558],[-82.7241,27.9481],[-82.722,27.9418],[-82.7214,27.9402],[-82.7204,27.9372],[-82.7201,27.9364],[-82.71,27.9283],[-82.6916,27.9249],[-82.6851,27.9163],[-82.6712,27.913],[-82.6281,27.9104],[-82.6342,27.9037],[-82.6321,27.8911],[-82.61,27.8735],[-82.5679,27.8837],[-82.5678,27.8815],[-82.5668,27.858],[-82.5984,27.8576],[-82.5948,27.8434],[-82.5893,27.8357],[-82.5865,27.8167],[-82.6074,27.7989],[-82.6227,27.7799],[-82.6305,27.7539],[-82.625,27.7327],[-82.6257,27.727],[-82.6336,27.7106],[-82.6398,27.7039],[-82.6525,27.7003],[-82.6629,27.7023],[-82.6632,27.7024],[-82.6674,27.7042],[-82.6688,27.7047],[-82.6704,27.7054],[-82.6709,27.7056],[-82.6715,27.7059],[-82.6716,27.7059],[-82.6721,27.7059],[-82.6731,27.706],[-82.6741,27.706],[-82.6773,27.7062],[-82.679,27.6961]]]]}},{"type":"Feature","properties":{"name":"Hillsborough"},"geometry":{"type":"Polygon","coordinates":[[[-82.644,28.1733],[-82.1059,28.1716],[-82.0563,28.1716],[-82.0564,28.0804],[-82.054,27.8507],[-82.0543,27.6464],[-82.5247,27.6454],[-82.5249,27.6454],[-82.5495,27.6456],[-82.5545,27.6451],[-82.5371,27.6729],[-82.5143,27.7056],[-82.4949,27.719],[-82.4824,27.7199],[-82.4776,27.723],[-82.4763,27.7299],[-82.4771,27.7352],[-82.4823,27.7426],[-82.4783,27.7462],[-82.4575,27.7526],[-82.4346,27.7644],[-82.432,27.7681],[-82.434,27.7741],[-82.4191,27.7938],[-82.4184,27.8032],[-82.4108,27.8109],[-82.4029,27.8127],[-82.3934,27.8375],[-82.3975,27.8516],[-82.4026,27.8826],[-82.4139,27.9014],[-82.4323,27.9013],[-82.4516,27.9075],[-82.46,27.9116],[-82.4596,27.9169],[-82.4621,27.9201],[-82.4781,27.9277],[-82.4898,27.9196],[-82.4911,27.9145],[-82.4874,27.895],[-82.4881,27.8636],[-82.4801,27.8532],[-82.4716,27.8473],[-82.4688,27.8433],[-82.4724,27.8226],[-82.4753,27.821],[-82.4898,27.8226],[-82.5112,27.828],[-82.5539,27.8485],[-82.5529,27.8627],[-82.5386,27.8649],[-82.5332,27.8707],[-82.5299,27.8775],[-82.5393,27.885],[-82.5428,27.8906],[-82.5417,27.8937],[-82.5358,27.898],[-82.5313,27.9039],[-82.5337,27.933],[-82.5412,27.949],[-82.5539,27.967],[-82.5894,27.9709],[-82.6195,27.9697],[-82.6486,27.9663],[-82.6486,28.0386],[-82.6512,28.1733],[-82.6497,28.1733],[-82.644,28.1733]]]}}]};
+  var css = getComputedStyle(document.documentElement);
+  function tok(n){ return css.getPropertyValue(n).trim(); }
+  var map = L.map('map', { zoomControl: true, scrollWheelZoom: false });
+  // County outlines: a basemap that still draws when tile images can't load.
+  L.geoJSON(COUNTIES, { style: function(){ return { color: tok('--landline'), weight: 1, fillColor: tok('--land'), fillOpacity: 1 }; }, interactive: false }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+  var esc = function(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; };
+  var bounds = [];
+  PICKS.forEach(function(p){
+    var icon = L.divIcon({ className: '', html: '<div class="pin"><span>' + p.rating.toFixed(1) + '</span></div>', iconSize: [38,38], iconAnchor: [4,36], popupAnchor: [14,-34] });
+    var m = L.marker([p.lat, p.lng], { icon: icon, title: p.name, keyboard: true }).addTo(map);
+    m.bindTooltip(esc(p.name), { permanent: true, direction: 'right', offset: [22,-18], className: 'pin-label' });
+    m.bindPopup('<div class="pop"><div class="r">Rating ' + p.rating.toFixed(1) + ' / 10 &middot; ' + esc(p.area) + '</div><h4>' + esc(p.name) + '</h4><p>' + esc(p.summary) + '</p><div class="links"><a href="' + p.yelp + '" target="_blank" rel="noopener">' + (p.yelpExact ? 'Yelp' : 'Yelp (search)') + '</a><a href="' + p.website + '" target="_blank" rel="noopener">Website</a><a href="' + p.gmaps + '" target="_blank" rel="noopener">Google Maps</a></div></div>');
+    bounds.push([p.lat, p.lng]);
+    var row = document.querySelector('[data-pin="' + p.name + '"]');
+    if (row) row.addEventListener('click', function(ev){ ev.preventDefault(); document.getElementById('map').scrollIntoView({behavior:'smooth', block:'center'}); map.setView([p.lat,p.lng], 14); m.openPopup(); });
+  });
+  map.fitBounds(bounds, { padding: [50, 50] });
+  map.on('click', function(){ map.scrollWheelZoom.enable(); });
+  var shell = document.querySelector('.map-shell'), btn = document.getElementById('expand');
+  btn.addEventListener('click', function(){
+    var full = shell.classList.toggle('full');
+    btn.textContent = full ? 'Close full screen' : 'Expand map';
+    btn.setAttribute('aria-pressed', full);
+    document.body.style.overflow = full ? 'hidden' : '';
+    setTimeout(function(){ map.invalidateSize(); map.fitBounds(bounds, { padding: [50, 50] }); }, 60);
+  });
+  document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape' && shell.classList.contains('full')) btn.click(); });
+})();
+</script>
+</body></html>
